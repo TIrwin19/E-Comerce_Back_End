@@ -3,11 +3,11 @@ const { Category, Product } = require('../../models');
 
 // The `/api/categories` endpoint
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   // find all categories
   // be sure to include its associated Products
   try{
-    const allCategories = Category.findAll({
+    const allCategories = await Category.findAll({
       include: Product
     })
 
@@ -18,12 +18,12 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
   try{
     const id = req.params.id
-    const category = Category.findByPk(id, {
+    const category = await Category.findByPk(id, {
       include: Product
     })
 
@@ -38,7 +38,7 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   // create a new category
   try{
     const newCategory = req.body
@@ -47,7 +47,7 @@ router.post('/', (req, res) => {
       return res.json({message: 'Please enter a Catagory'})
     }
 
-    const addCategory = Category.create(newCategory)
+    const addCategory = await Category.create(newCategory)
     res.json(addCategory)
 
   } catch(err) {
@@ -55,18 +55,18 @@ router.post('/', (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   // update a category by its `id` value
   const id = req.params.id
   try{
     const updateName = req.body.category_name
 
-    const category = Category.findByPk(id)
+    const category = await Category.findByPk(id)
     if(!category){
       return res.json({message: 'Category not found'})
     }
 
-    Category.update({category_name: updateName}, {
+    await Category.update({category_name: updateName}, {
       where:{
         id: id
       }
@@ -78,11 +78,11 @@ router.put('/:id', (req, res) => {
   
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
   const id = req.params.id
   try {
-    const category = Category.findByPk(id)
+    const category = await Category.findByPk(id)
 
     if (category) {
       category.destroy()

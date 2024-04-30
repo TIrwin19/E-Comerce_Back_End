@@ -5,7 +5,6 @@ const { Category, Product } = require('../../models');
 
 router.get('/', async (req, res) => {
   // find all categories
-  // be sure to include its associated Products
   try{
     const allCategories = await Category.findAll({
       include: Product
@@ -20,7 +19,6 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   // find one category by its `id` value
-  // be sure to include its associated Products
   try{
     const id = req.params.id
     const category = await Category.findByPk(id, {
@@ -58,22 +56,20 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   // update a category by its `id` value
   const id = req.params.id
+  const updateName = req.body
   try{
-    const updateName = req.body.category_name
-
     const category = await Category.findByPk(id)
+
     if(!category){
       return res.json({message: 'Category not found'})
     }
 
-    await Category.update({category_name: updateName}, {
-      where:{
-        id: id
-      }
-    })
+    await category.update(updateName)
 
+    res.json({message: 'Category update successfully'})
   } catch(err) {
     console.log(err)
+    res.status(400).json({message: 'Internal server error'})
   }
   
 });
@@ -81,21 +77,22 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
   const id = req.params.id
+
   try {
     const category = await Category.findByPk(id)
 
-    if (category) {
-      category.destroy()
+    if (!category) {
       return res.json({
-        message: 'Category deleted successfully'
+        message: 'Category Not Found'
       })
     }
 
-    res.status(400).json({
-      message: 'Category does not exist'
-    })
+    await category.destroy()
+
+    res.json({message: 'Category deleted successfully'})
   } catch (err) {
     console.log(err)
+    res.status(400).json({message: 'Category does not exist'})
   }
 });
 
